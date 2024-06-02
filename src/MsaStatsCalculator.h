@@ -9,16 +9,19 @@
 #include "summary_stats_defs.h"
 using namespace std;
 
-class MSA
+class MsaStatsCalculator
 {
 public:
+
+	// MsaStatsCalculator(const MSA &msa); 
+
 	// This construction also computes all the summary statistics.
-	MSA(const vector<string> & seqArray); 
+	MsaStatsCalculator(const vector<string> & seqArray); 
 	
 	// This construction reads a FASTA file into the MSA and computes summary statistics
-	MSA(string filename);
+	MsaStatsCalculator(string filename);
 
-	MSA(){};
+	// MSA(){};
 
 	int getMSAlength() const {return _originalAlignedSeqs[0].size();}
 	int getNumberOfSequences() const {return _numberOfSequences;} 
@@ -57,7 +60,7 @@ public:
 
 	vector<double> getStatVec();
 	
-	~MSA();
+	~MsaStatsCalculator();
 
 private:
 	const vector<string> _originalAlignedSeqs; //The aligned sequences

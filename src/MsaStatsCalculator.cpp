@@ -1,18 +1,18 @@
-#include "MSA.h"
+#include "MsaStatsCalculator.h"
 
-MSA::MSA(const vector<string> & seqArray) : _originalAlignedSeqs(seqArray), _numberOfSequences(seqArray.size())
+MsaStatsCalculator::MsaStatsCalculator(const vector<string> & seqArray) : _originalAlignedSeqs(seqArray), _numberOfSequences(seqArray.size())
 {
 	initializeAllVariables();
 } //constructor from vector string
 
-MSA::MSA(string filename) : _originalAlignedSeqs(read_fasta_from_file(filename)),
+MsaStatsCalculator::MsaStatsCalculator(string filename) : _originalAlignedSeqs(read_fasta_from_file(filename)),
 							_numberOfSequences(_originalAlignedSeqs.size())
 {
     initializeAllVariables();
 } //constructor from sequence file in fasta
 
 
-void MSA::initializeAllVariables() {
+void MsaStatsCalculator::initializeAllVariables() {
 
 	_alignedSeqs.clear();
 	_alignedSeqs.resize(_originalAlignedSeqs.size());
@@ -56,7 +56,7 @@ void MSA::initializeAllVariables() {
 	_totalNumberOfUniqueIndels = 0;
 }
 
-void MSA::recomputeStats() {
+void MsaStatsCalculator::recomputeStats() {
 	initializeAllVariables();
 
 	trimMSAFromAllIndelPositionAndgetSummaryStatisticsFromIndelCounter();
@@ -64,7 +64,7 @@ void MSA::recomputeStats() {
 	setLongestAndShortestSequenceLengths();
 }
 
-void MSA::fillUniqueGapsMap()
+void MsaStatsCalculator::fillUniqueGapsMap()
 {
 	for(int j=0; j<_numberOfSequences; j++)	
 	{
@@ -143,7 +143,7 @@ void MSA::fillUniqueGapsMap()
 	}
 }
 
-vector<string> MSA::getUnalignedSeqs() const {
+vector<string> MsaStatsCalculator::getUnalignedSeqs() const {
 	vector<string> unalignedSeqs;
 	for(int j=0; j<_numberOfSequences; j++)	
 	{
@@ -161,7 +161,7 @@ vector<string> MSA::getUnalignedSeqs() const {
 }
 
 
-void MSA::setValuesOfIndelSummStats()
+void MsaStatsCalculator::setValuesOfIndelSummStats()
 {	
 	_totalNumberOfIndels = 0;
 	_totalNumberOfUniqueIndels = 0;
@@ -241,7 +241,7 @@ void MSA::setValuesOfIndelSummStats()
 
 
 
-void MSA::setLongestAndShortestSequenceLengths()
+void MsaStatsCalculator::setLongestAndShortestSequenceLengths()
 {
 	vector<int> sequencesLengths(_numberOfSequences,0);
 	_longestSeqLength = 0;
@@ -264,13 +264,13 @@ void MSA::setLongestAndShortestSequenceLengths()
 	}
 }
 
-MSA::~MSA()
+MsaStatsCalculator::~MsaStatsCalculator()
 {
 	_alignedSeqs.clear();
 }
 
 
-double MSA::getStatValByType(stat_type statTypeToGet)
+double MsaStatsCalculator::getStatValByType(stat_type statTypeToGet)
 {
 	switch(statTypeToGet)
 	{
@@ -331,7 +331,7 @@ double MSA::getStatValByType(stat_type statTypeToGet)
 	}
 }
 
-void MSA::trimMSAFromAllIndelPositionAndgetSummaryStatisticsFromIndelCounter() {
+void MsaStatsCalculator::trimMSAFromAllIndelPositionAndgetSummaryStatisticsFromIndelCounter() {
 	_numberOfMSA_position_with_0_gaps = 0;
 	_numberOfMSA_position_with_1_gaps = 0;
 	_numberOfMSA_position_with_2_gaps = 0;
@@ -361,21 +361,11 @@ void MSA::trimMSAFromAllIndelPositionAndgetSummaryStatisticsFromIndelCounter() {
 		else if (_indelCounter[i] == 2) _numberOfMSA_position_with_2_gaps++;
 		else if (_indelCounter[i] == _numberOfSequences-1) _numberOfMSA_position_with_n_minus_1_gaps++;
 	}
-	//cout << "AFTER:" << endl;
-	//printMSA();
-}
 
-void MSA::printMSA() {
-	for (int i = 0; i < _numberOfSequences; i++) {
-		for (int j = 0; j < getMSAlength(); j++) {
-			cout<<_alignedSeqs[i][j];
-		}
-		cout << endl;
-	}
 }
 
 
-vector<double> MSA::getStatVec() {
+vector<double> MsaStatsCalculator::getStatVec() {
 	vector<double> statVals;
 
 	statVals.push_back(getStatValByType(AVG_GAP_SIZE));
