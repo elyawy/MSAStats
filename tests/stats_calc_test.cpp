@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "../src/MSA.h"
+#include "../src/MsaStatsCalculator.h"
 
 int main() {
 

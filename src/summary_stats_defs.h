@@ -1,8 +1,9 @@
 #ifndef _SUMMARY_STATS_DEF
 #define _SUMMARY_STATS_DEF
 
-enum stat_type
-{
+#include "enum.h"
+
+BETTER_ENUM(stat_type, int,
 	AVG_GAP_SIZE,
 	MSA_LEN,
 	MSA_MAX_LEN,
@@ -30,6 +31,7 @@ enum stat_type
 	MSA_POSITION_WITH_1_GAPS,
 	MSA_POSITION_WITH_2_GAPS,
 	MSA_POSITION_WITH_N_MINUS_1_GAPS
-};
+)
+
 
 #endif

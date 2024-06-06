@@ -59,6 +59,7 @@ public:
     void recomputeStats();
 
 	vector<double> getStatVec();
+
 	
 	~MsaStatsCalculator();
 

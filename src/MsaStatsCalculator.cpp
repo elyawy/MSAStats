@@ -274,62 +274,63 @@ double MsaStatsCalculator::getStatValByType(stat_type statTypeToGet)
 {
 	switch(statTypeToGet)
 	{
-		case AVG_GAP_SIZE:
+		case stat_type::AVG_GAP_SIZE:
 			return getAverageIndelSize();
-		case MSA_LEN:
+		case stat_type::MSA_LEN:
 			return (double)getMSAlength();
-		case MSA_MAX_LEN:
+		case stat_type::MSA_MAX_LEN:
 			return (double)getMSALongestSeqLength();
-		case MSA_MIN_LEN:
+		case stat_type::MSA_MIN_LEN:
 			return (double)getMSAshortestSeqLength();
-		case TOT_NUM_GAPS:
+		case stat_type::TOT_NUM_GAPS:
 			return (double)getTotalNumberOfIndels();
-		case NUM_GAPS_LEN_ONE:
+		case stat_type::NUM_GAPS_LEN_ONE:
 			return (double)getNumberOfIndelsOfLengthOne();
-		case NUM_GAPS_LEN_TWO:
+		case stat_type::NUM_GAPS_LEN_TWO:
 			return (double)getNumberOfIndelsOfLengthTwo();
-		case NUM_GAPS_LEN_THREE:
+		case stat_type::NUM_GAPS_LEN_THREE:
 			return (double)getNumberOfIndelsOfLengthThree();
-		case NUM_GAPS_LEN_AT_LEAST_FOUR:
+		case stat_type::NUM_GAPS_LEN_AT_LEAST_FOUR:
 			return (double)getNumberOfIndelsOfLengthAtLeastFour();
-		case AVG_UNIQUE_GAP_SIZE:
+		case stat_type::AVG_UNIQUE_GAP_SIZE:
 			return getAverageUniqueIndelSize();
-		case TOT_NUM_UNIQUE_GAPS:
+		case stat_type::TOT_NUM_UNIQUE_GAPS:
 			return (double)getTotalNumberOfUniqueIndels();
-		case NUM_GAPS_LEN_ONE_POS_1_GAPS:
+		case stat_type::NUM_GAPS_LEN_ONE_POS_1_GAPS:
 			return (double)getnumberOfIndelsOfLengthOneInOnePosition();
-		case NUM_GAPS_LEN_ONE_POS_2_GAPS:
+		case stat_type::NUM_GAPS_LEN_ONE_POS_2_GAPS:
 			return (double)getnumberOfIndelsOfLengthOneInTwoPositions();
-		case NUM_GAPS_LEN_ONE_POS_N_MINUS_1_GAPS:
+		case stat_type::NUM_GAPS_LEN_ONE_POS_N_MINUS_1_GAPS:
 			return (double)getnumberOfIndelsOfLengthOneInNMinus1Positions();
-		case NUM_GAPS_LEN_TWO_POS_1_GAPS:
+		case stat_type::NUM_GAPS_LEN_TWO_POS_1_GAPS:
 			return (double)getnumberOfIndelsOfLengthTwoInOnePosition();
-		case NUM_GAPS_LEN_TWO_POS_2_GAPS:
+		case stat_type::NUM_GAPS_LEN_TWO_POS_2_GAPS:
 			return (double)getnumberOfIndelsOfLengthTwoInTwoPositions();
-		case NUM_GAPS_LEN_TWO_POS_N_MINUS_1_GAPS:
+		case stat_type::NUM_GAPS_LEN_TWO_POS_N_MINUS_1_GAPS:
 			return (double)getnumberOfIndelsOfLengthTwoInNMinus1Positions();
-		case NUM_GAPS_LEN_THREE_POS_1_GAPS:
+		case stat_type::NUM_GAPS_LEN_THREE_POS_1_GAPS:
 			return (double)getnumberOfIndelsOfLengthThreeInOnePosition();
-		case NUM_GAPS_LEN_THREE_POS_2_GAPS:
+		case stat_type::NUM_GAPS_LEN_THREE_POS_2_GAPS:
 			return (double)getnumberOfIndelsOfLengthThreeInTwoPositions();
-		case NUM_GAPS_LEN_THREE_POS_N_MINUS_1_GAPS:
+		case stat_type::NUM_GAPS_LEN_THREE_POS_N_MINUS_1_GAPS:
 			return (double)getnumberOfIndelsOfLengthThreeInNMinus1Positions();
-		case NUM_GAPS_LEN_AT_LEAST_FOUR_POS_1_GAPS:
+		case stat_type::NUM_GAPS_LEN_AT_LEAST_FOUR_POS_1_GAPS:
 			return (double)getnumberOfIndelsOfLengthAtLeastFourInOnePosition();
-		case NUM_GAPS_LEN_AT_LEAST_FOUR_POS_2_GAPS:
+		case stat_type::NUM_GAPS_LEN_AT_LEAST_FOUR_POS_2_GAPS:
 			return (double)getnumberOfIndelsOfLengthAtLeastFourInTwoPositions();
-		case NUM_GAPS_LEN_AT_LEAST_FOUR_POS_N_MINUS_1_GAPS:
+		case stat_type::NUM_GAPS_LEN_AT_LEAST_FOUR_POS_N_MINUS_1_GAPS:
 			return (double)getnumberOfIndelsOfLengthAtLeastFourInNMinus1Positions();
-		case MSA_POSITION_WITH_0_GAPS:
+		case stat_type::MSA_POSITION_WITH_0_GAPS:
 			return (double)getNumberOfMSA_position_with_0_gaps();
-		case MSA_POSITION_WITH_1_GAPS:
+		case stat_type::MSA_POSITION_WITH_1_GAPS:
 			return (double)getNumberOfMSA_position_with_1_gaps();
-		case MSA_POSITION_WITH_2_GAPS:
+		case stat_type::MSA_POSITION_WITH_2_GAPS:
 			return (double)getNumberOfMSA_position_with_2_gaps();
-		case MSA_POSITION_WITH_N_MINUS_1_GAPS:
+		case stat_type::MSA_POSITION_WITH_N_MINUS_1_GAPS:
 			return (double)getNumberOfMSA_position_with_n_minus_1_gaps();
 	}
 }
+
 
 void MsaStatsCalculator::trimMSAFromAllIndelPositionAndgetSummaryStatisticsFromIndelCounter() {
 	_numberOfMSA_position_with_0_gaps = 0;
@@ -368,32 +369,32 @@ void MsaStatsCalculator::trimMSAFromAllIndelPositionAndgetSummaryStatisticsFromI
 vector<double> MsaStatsCalculator::getStatVec() {
 	vector<double> statVals;
 
-	statVals.push_back(getStatValByType(AVG_GAP_SIZE));
-	statVals.push_back(getStatValByType(MSA_LEN));
-	statVals.push_back(getStatValByType(MSA_MAX_LEN));
-	statVals.push_back(getStatValByType(MSA_MIN_LEN));
-	statVals.push_back(getStatValByType(TOT_NUM_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_ONE));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_TWO));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_THREE));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_AT_LEAST_FOUR));
-	statVals.push_back(getStatValByType(AVG_UNIQUE_GAP_SIZE));
-	statVals.push_back(getStatValByType(TOT_NUM_UNIQUE_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_ONE_POS_1_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_ONE_POS_2_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_ONE_POS_N_MINUS_1_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_TWO_POS_1_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_TWO_POS_2_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_TWO_POS_N_MINUS_1_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_THREE_POS_1_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_THREE_POS_2_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_THREE_POS_N_MINUS_1_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_AT_LEAST_FOUR_POS_1_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_AT_LEAST_FOUR_POS_2_GAPS));
-	statVals.push_back(getStatValByType(NUM_GAPS_LEN_AT_LEAST_FOUR_POS_N_MINUS_1_GAPS));
-	statVals.push_back(getStatValByType(MSA_POSITION_WITH_0_GAPS));
-	statVals.push_back(getStatValByType(MSA_POSITION_WITH_1_GAPS));
-	statVals.push_back(getStatValByType(MSA_POSITION_WITH_2_GAPS));
-	statVals.push_back(getStatValByType(MSA_POSITION_WITH_N_MINUS_1_GAPS));
+	statVals.push_back(getStatValByType(stat_type::AVG_GAP_SIZE));
+	statVals.push_back(getStatValByType(stat_type::MSA_LEN));
+	statVals.push_back(getStatValByType(stat_type::MSA_MAX_LEN));
+	statVals.push_back(getStatValByType(stat_type::MSA_MIN_LEN));
+	statVals.push_back(getStatValByType(stat_type::TOT_NUM_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_ONE));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_TWO));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_THREE));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_AT_LEAST_FOUR));
+	statVals.push_back(getStatValByType(stat_type::AVG_UNIQUE_GAP_SIZE));
+	statVals.push_back(getStatValByType(stat_type::TOT_NUM_UNIQUE_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_ONE_POS_1_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_ONE_POS_2_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_ONE_POS_N_MINUS_1_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_TWO_POS_1_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_TWO_POS_2_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_TWO_POS_N_MINUS_1_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_THREE_POS_1_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_THREE_POS_2_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_THREE_POS_N_MINUS_1_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_AT_LEAST_FOUR_POS_1_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_AT_LEAST_FOUR_POS_2_GAPS));
+	statVals.push_back(getStatValByType(stat_type::NUM_GAPS_LEN_AT_LEAST_FOUR_POS_N_MINUS_1_GAPS));
+	statVals.push_back(getStatValByType(stat_type::MSA_POSITION_WITH_0_GAPS));
+	statVals.push_back(getStatValByType(stat_type::MSA_POSITION_WITH_1_GAPS));
+	statVals.push_back(getStatValByType(stat_type::MSA_POSITION_WITH_2_GAPS));
+	statVals.push_back(getStatValByType(stat_type::MSA_POSITION_WITH_N_MINUS_1_GAPS));
 	return statVals;
 }
