@@ -7,6 +7,12 @@ from pathlib import Path
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
+from datetime import datetime
+
+now = datetime.now()
+
+__version__ = f"{now.year % 100}.{now.month+1}.0"
+
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
     "win32": "Win32",
@@ -125,11 +131,12 @@ class CMakeBuild(build_ext):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="msastats",
-    version="0.0.1",
+    version=__version__,
     author="Elya Wygoda",
     author_email="elya.wygoda@gmail.com",
     description="Simple utility to compute MSA summary statistics",
-    long_description="",
+    long_description=open("README.md", 'r').read(),
+    long_description_content_type='text/markdown',
     ext_modules=[CMakeExtension("msastats")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,

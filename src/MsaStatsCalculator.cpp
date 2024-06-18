@@ -329,6 +329,8 @@ double MsaStatsCalculator::getStatValByType(stat_type statTypeToGet)
 		case stat_type::MSA_POSITION_WITH_N_MINUS_1_GAPS:
 			return (double)getNumberOfMSA_position_with_n_minus_1_gaps();
 	}
+
+	return -1;
 }
 
 

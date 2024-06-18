@@ -76,36 +76,36 @@ jobs:
 
 
 
-  # make_sdist:
-  #   name: Make SDist
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #     with:
-  #       fetch-depth: 0  # Optional, use if you use setuptools_scm
-  #       submodules: true  # Optional, use if you have submodules
+  make_sdist:
+    name: Make SDist
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Optional, use if you use setuptools_scm
+        submodules: true  # Optional, use if you have submodules
 
-  #   - name: Build SDist
-  #     run: pipx run build --sdist
+    - name: Build SDist
+      run: pipx run build --sdist
 
-  #   - uses: actions/upload-artifact@v4
-  #     with:
-  #       name: cibw-sdist
-  #       path: dist/*.tar.gz
+    - uses: actions/upload-artifact@v4
+      with:
+        name: cibw-sdist
+        path: dist/*.tar.gz
 
-  # upload_pypi:
-  #     needs: [build_wheels, make_sdist]
-  #     runs-on: ubuntu-latest
-  #     environment: pypi
-  #     permissions:
-  #       id-token: write
-  #     # or, alternatively, upload to PyPI on every tag starting with 'v' (remove on: release above to use this)
-  #     steps:
-  #       - uses: actions/download-artifact@v4
-  #         with:
-  #           # unpacks all CIBW artifacts into dist/
-  #           pattern: cibw-*
-  #           path: dist
-  #           merge-multiple: true
+  upload_pypi:
+      needs: [build_wheels, make_sdist]
+      runs-on: ubuntu-latest
+      environment: pypi
+      permissions:
+        id-token: write
+      # or, alternatively, upload to PyPI on every tag starting with 'v' (remove on: release above to use this)
+      steps:
+        - uses: actions/download-artifact@v4
+          with:
+            # unpacks all CIBW artifacts into dist/
+            pattern: cibw-*
+            path: dist
+            merge-multiple: true
 
-  #       - uses: pypa/gh-action-pypi-publish@release/v1
+        - uses: pypa/gh-action-pypi-publish@release/v1
