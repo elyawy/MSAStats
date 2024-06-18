@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: msastats
+Version: 0.0.1
+Summary: Simple utility to compute MSA summary statistics
+Home-page: UNKNOWN
+Author: Elya Wygoda
+Author-email: elya.wygoda@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.7
+Provides-Extra: test
+
+UNKNOWN
+
