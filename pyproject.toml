@@ -3,7 +3,6 @@ requires = [
     "setuptools>=42",
     "wheel",
     "ninja",
-    "cmake>=3.12",
 ]
 build-backend = "setuptools.build_meta"
 
@@ -33,6 +32,26 @@ testpaths = ["tests"]
 [tool.cibuildwheel]
 skip =  ["pp*", "*-win32", "*-manylinux_i686", "*-musllinux_i686"]
 build-verbosity = 1
+
+# Install system dependencies before building wheels
+# This ensures OpenSSL is available for CMake and cmake is installed from system packages
+before-all = [
+    # For manylinux (yum-based)
+    "yum install -y openssl-devel cmake3 || yum install -y openssl-devel cmake || true",
+    # For debian-based systems  
+    "apt-get update && apt-get install -y libssl-dev cmake || true",
+]
+
+# macOS-specific configuration
+[tool.cibuildwheel.macos]
+before-all = [
+    "brew install cmake openssl || true",
+]
+
+# Windows doesn't need special OpenSSL setup for cmake
+[tool.cibuildwheel.windows]
+before-build = "pip install delvewheel"
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
 
 
 # [tool.ruff]
