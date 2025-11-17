@@ -11,7 +11,7 @@ from datetime import datetime
 
 now = datetime.now()
 
-__version__ = f"{now.year % 100}.{now.month+1}.0"
+__version__ = "25.11.1"
 
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
