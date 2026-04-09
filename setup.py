@@ -11,7 +11,7 @@ from datetime import datetime
 
 now = datetime.now()
 
-__version__ = "26.4.1"
+__version__ = "26.4.2"
 
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
