@@ -1,5 +1,5 @@
-#ifndef _MSA
-#define _MSA
+#ifndef _MSASTATS_CALCULATOR_H
+#define _MSASTATS_CALCULATOR_H
 #include <vector>
 #include <string>
 #include <cmath>
@@ -21,9 +21,15 @@ public:
 	// This construction reads a FASTA file into the MSA and computes summary statistics
 	MsaStatsCalculator(string filename);
 
+	// This construction accepts a run-length encoded (sparse) MSA representation directly,
+	// e.g. from a simulator's internal MSA object, avoiding building full aligned strings.
+	// sparseRuns[row] is a list of run lengths for that row: positive = non-gap run,
+	// negative = gap run (abs value = run length). Same convention as Sailfish's SparseMSA.
+	MsaStatsCalculator(const vector<vector<int>> & sparseRuns, int numberOfSequences, int msaLength);
+
 	// MSA(){};
 
-	int getMSAlength() const {return _originalAlignedSeqs[0].size();}
+	int getMSAlength() const {return _isSparseInput ? _msaLengthSparse : (int)_originalAlignedSeqs[0].size();}
 	int getNumberOfSequences() const {return _numberOfSequences;} 
 	int getTotalNumberOfIndels() const {return _totalNumberOfIndels;}
 	int getTotalNumberOfUniqueIndels() const {return _totalNumberOfUniqueIndels;}
@@ -68,6 +74,11 @@ private:
 
 	vector<string> _alignedSeqs; //The aligned sequences
 	int _numberOfSequences; // NUMBER OF SEQUENCES IN THE MSA
+
+	// --- sparse (run-length encoded) input path ---
+	bool _isSparseInput = false;
+	int _msaLengthSparse = 0;
+	vector<vector<int>> _originalSparseSeqs; //run-length rows as given (no trimming needed: no all-gap columns can occur)
 	double _aveIndelLength;
 	int _totalNumberOfIndels;
 	int _longestSeqLength;
@@ -112,6 +123,11 @@ private:
 	void trimMSAFromAllIndelPositionAndgetSummaryStatisticsFromIndelCounter();
 
 	void initializeAllVariables();
+
+	// sparse-path equivalents
+	void setValuesOfIndelSummStatsSparse();
+	void buildIndelMapAndPositionStatsSparse();
+	void setLongestAndShortestSequenceLengthsSparse();
 
 };
 #endif

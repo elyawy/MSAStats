@@ -11,6 +11,15 @@ MsaStatsCalculator::MsaStatsCalculator(string filename) : _originalAlignedSeqs(r
     initializeAllVariables();
 } //constructor from sequence file in fasta
 
+MsaStatsCalculator::MsaStatsCalculator(const vector<vector<int>> & sparseRuns, int numberOfSequences, int msaLength) :
+							_numberOfSequences(numberOfSequences),
+							_isSparseInput(true),
+							_msaLengthSparse(msaLength),
+							_originalSparseSeqs(sparseRuns)
+{
+	initializeAllVariables();
+} //constructor from run-length encoded (sparse) MSA
+
 
 void MsaStatsCalculator::initializeAllVariables() {
 
@@ -58,6 +67,13 @@ void MsaStatsCalculator::initializeAllVariables() {
 
 void MsaStatsCalculator::recomputeStats() {
 	initializeAllVariables();
+
+	if (_isSparseInput) {
+		buildIndelMapAndPositionStatsSparse();
+		setValuesOfIndelSummStatsSparse();
+		setLongestAndShortestSequenceLengthsSparse();
+		return;
+	}
 
 	trimMSAFromAllIndelPositionAndgetSummaryStatisticsFromIndelCounter();
 	setValuesOfIndelSummStats();
@@ -267,6 +283,165 @@ void MsaStatsCalculator::setLongestAndShortestSequenceLengths()
 MsaStatsCalculator::~MsaStatsCalculator()
 {
 	_alignedSeqs.clear();
+}
+
+// --- sparse (run-length encoded) input path ---
+// No all-gap columns can occur in this representation (per simulator guarantee), so unlike
+// the string path there is no trimming step: every negative (gap) run in the raw input is
+// already exactly one final indel occurrence, so we build _uniqueIndelMap directly off the
+// runs in a single pass, without ever materializing the aligned strings.
+
+void MsaStatsCalculator::buildIndelMapAndPositionStatsSparse() {
+	_numberOfMSA_position_with_0_gaps = 0;
+	_numberOfMSA_position_with_1_gaps = 0;
+	_numberOfMSA_position_with_2_gaps = 0;
+	_numberOfMSA_position_with_n_minus_1_gaps = 0;
+
+	int msaLength = getMSAlength();
+
+	// per-column gap counts, built via a difference array over runs (O(rows*runs)) instead
+	// of a full char scan (O(rows*msaLength)) as the string path does.
+	vector<int> diff(msaLength + 1, 0);
+
+	for (int row = 0; row < _numberOfSequences; row++) {
+		int pos = 0;
+		for (int run : _originalSparseSeqs[row]) {
+			if (run < 0) {
+				int len = -run;
+				diff[pos] += 1;
+				diff[pos + len] -= 1;
+				pos += len;
+			} else {
+				pos += run;
+			}
+		}
+	}
+
+	_indelCounter.assign(msaLength, 0);
+	int running = 0;
+	for (int i = 0; i < msaLength; i++) {
+		running += diff[i];
+		_indelCounter[i] = running;
+
+		if (_indelCounter[i] == 0) _numberOfMSA_position_with_0_gaps++;
+		else if (_indelCounter[i] == 1) _numberOfMSA_position_with_1_gaps++;
+		else if (_indelCounter[i] == 2) _numberOfMSA_position_with_2_gaps++;
+		else if (_indelCounter[i] == _numberOfSequences - 1) _numberOfMSA_position_with_n_minus_1_gaps++;
+	}
+
+	// now build the unique-indel map directly from the runs (each row's negative run is
+	// already a maximal, final gap occurrence - no trimming/merging required)
+	for (int row = 0; row < _numberOfSequences; row++) {
+		int pos = 0;
+		for (int run : _originalSparseSeqs[row]) {
+			if (run < 0) {
+				int len = -run;
+				pair<int,int> curr_pair(pos, pos + len - 1);
+				if (_uniqueIndelMap.find(curr_pair) == _uniqueIndelMap.end()) {
+					vector<int> curr_value;
+					curr_value.push_back(len);
+					curr_value.push_back(1);
+					_uniqueIndelMap[curr_pair] = curr_value;
+				} else {
+					_uniqueIndelMap[curr_pair][1]++;
+				}
+				pos += len;
+			} else {
+				pos += run;
+			}
+		}
+	}
+}
+
+void MsaStatsCalculator::setValuesOfIndelSummStatsSparse()
+{
+	_totalNumberOfIndels = 0;
+	_totalNumberOfUniqueIndels = 0;
+	_numberOfIndelsOfLengthOne = 0;
+	_numberOfIndelsOfLengthOneInOnePosition = 0;
+	_numberOfIndelsOfLengthOneInTwoPositions = 0;
+	_numberOfIndelsOfLengthOneInNMinus1Positions = 0;
+	_numberOfIndelsOfLengthTwo = 0;
+	_numberOfIndelsOfLengthTwoInOnePosition = 0;
+	_numberOfIndelsOfLengthTwoInTwoPositions = 0;
+	_numberOfIndelsOfLengthTwoInNMinus1Positions = 0;
+	_numberOfIndelsOfLengthThree = 0;
+	_numberOfIndelsOfLengthThreeInOnePosition = 0;
+	_numberOfIndelsOfLengthThreeInTwoPositions = 0;
+	_numberOfIndelsOfLengthThreeInNMinus1Positions = 0;
+	_numberOfIndelsOfLengthAtLeastFour = 0;
+	_numberOfIndelsOfLengthAtLeastFourInOnePosition = 0;
+	_numberOfIndelsOfLengthAtLeastFourInTwoPositions = 0;
+	_numberOfIndelsOfLengthAtLeastFourInNMinus1Positions = 0;
+	_aveIndelLength = 0;
+	_aveUniqueIndelLength = 0;
+
+	int total_number_of_gap_chars = 0;
+	int total_number_of_unique_gap_chars = 0;
+
+	// (unlike the string path, _uniqueIndelMap is already populated by
+	// buildIndelMapAndPositionStatsSparse - no fillUniqueGapsMap() call needed here)
+
+	typedef map<pair<int,int>, vector<int>>::iterator it_type;
+	for(it_type iterator = _uniqueIndelMap.begin(); iterator != _uniqueIndelMap.end(); iterator++)
+	{
+		vector<int> length_and_count = iterator->second;
+
+		total_number_of_gap_chars += (length_and_count[0] * length_and_count[1]);
+		_totalNumberOfIndels += length_and_count[1];
+
+		_totalNumberOfUniqueIndels++;
+		total_number_of_unique_gap_chars += length_and_count[0];
+
+		if(length_and_count[0] == 1)
+		{
+			_numberOfIndelsOfLengthOne += length_and_count[1];
+			if (length_and_count[1] == 1) _numberOfIndelsOfLengthOneInOnePosition++;
+			if (length_and_count[1] == 2) _numberOfIndelsOfLengthOneInTwoPositions++;
+			if (length_and_count[1] == getNumberOfSequences() - 1) _numberOfIndelsOfLengthOneInNMinus1Positions++;
+		}
+		if(length_and_count[0] == 2)
+		{
+			_numberOfIndelsOfLengthTwo += length_and_count[1];
+			if (length_and_count[1] == 1) _numberOfIndelsOfLengthTwoInOnePosition++;
+			if (length_and_count[1] == 2) _numberOfIndelsOfLengthTwoInTwoPositions++;
+			if (length_and_count[1] == getNumberOfSequences() - 1) _numberOfIndelsOfLengthTwoInNMinus1Positions++;
+		}
+		if(length_and_count[0] == 3)
+		{
+			_numberOfIndelsOfLengthThree += length_and_count[1];
+			if (length_and_count[1] == 1) _numberOfIndelsOfLengthThreeInOnePosition++;
+			if (length_and_count[1] == 2) _numberOfIndelsOfLengthThreeInTwoPositions++;
+			if (length_and_count[1] == getNumberOfSequences() - 1) _numberOfIndelsOfLengthThreeInNMinus1Positions++;
+		}
+		if(length_and_count[0] > 3)
+		{
+			_numberOfIndelsOfLengthAtLeastFour += length_and_count[1];
+			if (length_and_count[1] == 1) _numberOfIndelsOfLengthAtLeastFourInOnePosition++;
+			if (length_and_count[1] == 2) _numberOfIndelsOfLengthAtLeastFourInTwoPositions++;
+			if (length_and_count[1] == getNumberOfSequences() - 1) _numberOfIndelsOfLengthAtLeastFourInNMinus1Positions++;
+		}
+	}
+	if(_totalNumberOfIndels != 0)
+	{
+		_aveIndelLength = static_cast<double>(total_number_of_gap_chars)/static_cast<double>(_totalNumberOfIndels);
+		_aveUniqueIndelLength = static_cast<double>(total_number_of_unique_gap_chars)/static_cast<double>(_totalNumberOfUniqueIndels);
+	}
+}
+
+void MsaStatsCalculator::setLongestAndShortestSequenceLengthsSparse()
+{
+	_longestSeqLength = 0;
+	_shortestSeqLength = 0;
+	for (int row = 0; row < _numberOfSequences; row++) {
+		int len = 0;
+		for (int run : _originalSparseSeqs[row]) {
+			if (run > 0) len += run;
+		}
+		if (row == 0) _shortestSeqLength = len;
+		if (len < _shortestSeqLength) _shortestSeqLength = len;
+		if (len > _longestSeqLength) _longestSeqLength = len;
+	}
 }
 
 
